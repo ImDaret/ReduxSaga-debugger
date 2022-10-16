@@ -40,6 +40,7 @@ const createConfig = ({
   output: {
     name: 'ReduxSaga',
     exports: 'named',
+    sourcemap: true,
     ...output,
   },
   external: makeExternalPredicate(external === 'peers' ? peerDeps : deps.concat(peerDeps)),

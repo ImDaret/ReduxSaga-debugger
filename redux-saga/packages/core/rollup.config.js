@@ -37,6 +37,7 @@ const createConfig = ({ input, output, external, env, useESModules = output.form
   input,
   output: {
     exports: 'named',
+    sourcemap: true,
     ...output,
   },
   external: makeExternalPredicate(external === 'peers' ? peerDeps : deps.concat(peerDeps)),
