@@ -44,7 +44,7 @@ put(input) {
 }
 ```
 
-已知 put 一个 action 会首先从 takers（也就是 nextTakers） 中找到与之匹配的 taker 并执行它，那么新的问题又来了，是什么时候往 nextTakers 中赋值的呢？答案就在 channel.take 身上，我在源码中搜索了一下 channel.take，发现它是在 runTakeEffect 中触发的
+已知 put 一个 action 会首先从 takers（也就是 nextTakers） 中找到与之匹配的 taker 并执行它，那么新的问题又来了，是什么时候往 nextTakers 中赋值的呢？答案就在 channel.take 身上，我在源码中搜索了一下 channel.take，发现它是在 runTakeEffect 中触发的.
 
 我们使用 take 时往往是这样子的
 
