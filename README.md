@@ -4,10 +4,12 @@
 
 ## 基本流程
 
-要使用 saga 首先要在 redux 中注册 saga 中间件。
+要使用 saga 首先要在 redux 中注册 saga 中间件。并且 调用它的 run 方法注册 rootSaga
 
 ```js
-applyMiddleware(createSagaMiddleware());
+const sagaMiddleware = createSagaMiddleware();
+applyMiddleware(sagaMiddleware);
+sagaMiddleware.run(rootSaga);
 ```
 
 对应的`createSagaMiddleware`返回值如下：
@@ -44,12 +46,20 @@ put(input) {
 }
 ```
 
-已知 put 一个 action 会首先从 takers（也就是 nextTakers） 中找到与之匹配的 taker 并执行它，那么新的问题又来了，是什么时候往 nextTakers 中赋值的呢？答案就在 channel.take 身上，我在源码中搜索了一下 channel.take，发现它是在 runTakeEffect 中触发的.
+已知 put 一个 action 会首先从 takers（也就是 nextTakers） 中找到与之匹配的 taker 并执行它，那么新的问题又来了，是什么时候往 nextTakers 中赋值的呢？我们可以大胆猜测一下，一定是`sagaMiddleware.run(rootSaga)`这段代码，只有在全局注册好，才能在任意 put 触发的时候匹配上，我们可以来看一下
 
-我们使用 take 时往往是这样子的
+sagaMiddleware.run 源码
 
 ```js
-yield take('TODO')
+sagaMiddleware.run = (...args) => {
+  return boundRunSaga(...args);
+};
+```
+
+boundRunSaga 其实就是对应源码中的 runSaga,其主要作用是把 rootSaga 转化成 iterator 变量，然后传入 proc 函数中并调用,proc 相当于是事件处理器，每次进来都会调用 next(),而 next 中会计算 iterator.next()的结果传入并调用 digestEffect
+
+```js
+
 ```
 
 channel.take 源码
