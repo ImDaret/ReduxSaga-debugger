@@ -233,6 +233,8 @@ function runTakeEffect(env, { channel = env.channel, pattern, maybe }, cb) {
 
 至此我们完成了简单的闭环，让我们来画一张流程图加深一下理解
 
+![sagaProcess](imgs/sagaProcess.png)
+
 ## 设计思路
 
 - 为什么需要 call、put 等 api，这些 api 看起来都是多余的
