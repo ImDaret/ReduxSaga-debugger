@@ -1,8 +1,13 @@
 # ReduxSaga-debugger
 
-**tip: 本文适合有一定 redux-saga 使用经验的人阅读，为了阅读体验，以下代码只截取部分核心代码**
+**tip: 本文适合有一定 redux-saga 使用经验的人阅读，为了阅读体验，以下代码只截取部分核心代码。**
+**本文将依次讲述 redux-saga 的作用、基本流程和源码分析、值得沉淀的工具函数、我对于 redux-saga 的思考、FAQ 这 5 个模块**
 
-## 基本流程
+## 为什么需要 redux-saga
+
+redux 中 reducer 要求是一个纯函数，但是像异步获取数据，访问浏览器缓存这些副作用没法管理，所以诞生了 redux-thunk,redux-saga 等一系列的中间件，不同于 redux-thunk，可以把 redux-saga 看作一个独立的线程，在这个线程里面既可以获取 redux 中的 state，也可以 dispatch 一个 action，而且它更利于测试，也不会造成回调地狱。
+
+## 基本流程、源码分析
 
 要使用 saga 首先要在 redux 中注册 saga 中间件。并且 调用它的 run 方法注册 rootSaga
 
@@ -233,9 +238,28 @@ function runTakeEffect(env, { channel = env.channel, pattern, maybe }, cb) {
 
 至此我们完成了简单的闭环，让我们来画一张流程图加深一下理解
 
-![sagaProcess](imgs/sagaProcess.png)
+[![sagaProcess](imgs/sagaProcess.png)](https://github.com/ImDaret/ReduxSaga-debugger/blob/main/imgs/sagaProcess.png)
 
-## 设计思路
+## 值得沉淀的工具函数
+
+高阶函数：返回只能调用一次的函数
+
+```js
+function once(fn) {
+  let called = false;
+  return () => {
+    if (called) {
+      return;
+    }
+    called = true;
+    fn();
+  };
+}
+```
+
+## 我对 redux-saga 的思考
+
+## FAQ
 
 - 为什么需要 call、put 等 api，这些 api 看起来都是多余的
 
