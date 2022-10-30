@@ -42,8 +42,24 @@
 
       const effects = ReduxSaga.effects;
 
+      const getToken = () => {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve("success");
+          }, 5000);
+        });
+      };
+
       function* incrementAsync() {
         yield effects.delay(1000);
+        console.time("token1");
+        const token1 = yield effects.fork(getToken);
+        console.log(token1, "token1 End");
+        console.timeEnd("token1");
+        console.time("token2");
+        const token2 = yield effects.call(getToken);
+        console.log(token2, "token2 End");
+        console.timeEnd("token2");
         yield effects.put({ type: "INCREMENT" });
       }
 

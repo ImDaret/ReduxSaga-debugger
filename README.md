@@ -1,13 +1,22 @@
-# ReduxSaga-debugger
+# DEBUGGER FOR REDUX_SAGA
 
-**tip: 本文适合有一定 redux-saga 使用经验的人阅读，为了阅读体验，以下代码只截取部分核心代码。**
-**本文将依次讲述 redux-saga 的作用、基本流程和源码分析、值得沉淀的工具函数、我对于 redux-saga 的思考、FAQ 这 5 个模块**
+## 前言
 
-## 为什么需要 redux-saga
+本文的目的是让大家了解 redux-saga 源码的主流程，适合有一定 redux-saga 使用经验的人阅读，主要分为 4 个部分
 
-redux 中 reducer 要求是一个纯函数，但是像异步获取数据，访问浏览器缓存这些副作用没法管理，所以诞生了 redux-thunk,redux-saga 等一系列的中间件，不同于 redux-thunk，可以把 redux-saga 看作一个独立的线程，在这个线程里面既可以获取 redux 中的 state，也可以 dispatch 一个 action，而且它更利于测试，也不会造成回调地狱。
+- 为什么诞生
+- 主流程
+- 工具函数
+- 思考
+- FAQ
 
-## 基本流程、源码分析
+**注意事项：为了便于读者理解，源码只会截取部分，如果想要进一步了解，可在[此仓库](https://github.com/ImDaret/ReduxSaga-debugger)的 index.html 中自行 debugger**
+
+## 为什么诞生
+
+redux 中 reducer 要求是一个纯函数，但是像异步获取数据，访问浏览器缓存这些副作用没法管理，所以诞生了 redux-saga
+
+## 主流程
 
 要使用 saga 首先要在 redux 中注册 saga 中间件。并且 调用它的 run 方法注册 rootSaga
 
@@ -240,7 +249,7 @@ function runTakeEffect(env, { channel = env.channel, pattern, maybe }, cb) {
 
 [![sagaProcess](imgs/sagaProcess.png)](https://github.com/ImDaret/ReduxSaga-debugger/blob/main/imgs/sagaProcess.png)
 
-## 值得沉淀的工具函数
+## 工具函数
 
 高阶函数：返回只能调用一次的函数
 
@@ -257,10 +266,20 @@ function once(fn) {
 }
 ```
 
-## 我对 redux-saga 的思考
+## 思考
+
+不同于 redux-thunk，可以把 redux-saga 看作一个独立的线程，在这个线程里面既可以获取 redux 中的 state，也可以 dispatch 一个 action，而且它更利于测试，也不会造成回调地狱。saga 的设计精妙之处在于利用了 generator 的特性（next 完了之后可以交由外部控制），把所有的 effect 都对应成一个对象，然后由 proc 去处理，这也是它的核心竞争力所在，用户可以精确地控制每一步对应的操作，而且还额外提供了很多 effect 方法和辅助函数。
 
 ## FAQ
 
-- 为什么需要 call、put 等 api，这些 api 看起来都是多余的
+### 1. call 辅助函数在源码中只是返回了一个对象，它的执行机制是怎样的
 
-  [参考链接](https://redux-saga-in-chinese.js.org/docs/basics/DeclarativeEffects.html)
+redux-saga 要求注册的 saga 回调都是 generator 函数，所以当发生一个 channel.put 时，就会进入一个 generator 环境，yield call(xxx)返回一个 effect 对象，然后将它交由在上文提到的 proc 中匹配到对应的 effectRunner 并执行它
+
+### 2. 相比于 call，fork 是怎么不阻塞 generator 协程调用的
+
+runCallEffect，当回调是个 promise 时会等 promise 执行完毕再 next(),当时一个 generator 时会调用 proc 开启一个新的 task，等 task 执行完成才会 next()
+
+runForkEffect，直接调用 proc 开启一个新的 task，并且直接 next()进入下一步
+
+**tip: next 对应源码中的 cb**
