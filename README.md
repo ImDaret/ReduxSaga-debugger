@@ -10,7 +10,7 @@
 - [思考](#思考)
 - [FAQ](#faq)
 
-**注意事项：为了便于读者理解，源码只会截取部分，如果想要进一步了解，可在[此仓库](https://github.com/ImDaret/ReduxSaga-debugger)的 index.html 中自行 debugger**
+**注意事项：为了便于读者理解，源码只会截取部分，如果想要进一步了解，可在[此仓库](https://github.com/ImDaret/reduxSaga-debugger)的 index.html 中自行 debugger**
 
 ## 为什么诞生
 
